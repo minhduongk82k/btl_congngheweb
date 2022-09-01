@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800;900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+	<style>
+		* {
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
+
+		html {
+			font-family: 'Roboto', sans-serif;
+		}
+
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		form {
+			margin-bottom: 24px;
+			margin-top: 24px;
+			display: flex;
+			gap: 12px;
+			flex-direction: column;
+		}
+
+		label {
+			margin-right: 8px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		table,
+		td,
+		th {
+			border: 1px solid black;
+			padding: 5px;
+		}
+
+		td {
+			text-align: center;
+		}
+
+		th {
+			text-align: center;
+		}
+
+		button {
+			border: none;
+			border-radius: 8px;
+			height: 32px;
+			line-height: 24px;
+			background-color: #333;
+			color: #fff;
+			font-size: 16px;
+		}
+
+		#masach {
+			height: 24px;
+			border: 1px solid #000;
+			border-radius: 8px;
+		}
+	</style>
+	<title>Form</title>
+</head>
+
+<body>
+	<form method="GET">
+		<div class="input-div">
+			<label for="masach">Mã sách</label>
+			<input type="text" name="masach" id="masach" />
+		</div>
+		<div class="select-div">
+			<label for="theloai">Thể loại</label>
+			<select name="theloai">
+				<option value="Tin học">Tin học</option>
+				<option value="Ngoại ngữ">Ngoại ngữ</option>
+				<option value="Toán">Toán</option>
+			</select>
+		</div>
+		<button type="submit">Tìm kiếm</button>
+	</form>
+</body>
+
+<script type="text/javascript">
+	// function getBook() {
+
+	// 	alert(result);
+	// 	return false;
+	// }
+</script>
+
+</html>
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "TommyShelby";
+$db = "QL_SACH";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $db);
+// Check connection
+if (!$conn) {
+	die("Connection failed: " . mysqli_connect_error());
+}
+
+$masach = $_GET['masach'] ?? null;
+$theloai = $_GET['theloai'] ?? null;
+$id = $_GET['id'] ?? null;
+
+$sql = "";
+if ($id) {
+	$sql = "SELECT * FROM SACH WHERE masach = '" . $id . "'";
+} else if ($masach) {
+	$sql = "SELECT * FROM SACH WHERE masach = '" . $masach . "'";
+} else {
+	$sql = "SELECT * FROM SACH WHERE theloai = '" . $theloai . "'";
+}
+$result = mysqli_query($conn, $sql);
+if ($id) {
+	echo "<table>
+		<tr>
+		<th>STT</th>
+		<th>Mã sách</th>
+		<th>Tên sách</th>
+		<th>Tác giả</th>
+		<th>Nhà xuất bản</th>
+		<th>Giá</th>
+		<th>Thể loại</th>
+		</tr>";
+} else if ($masach || $theloai) {
+	echo "<table>
+		<tr>
+		<th>STT</th>
+		<th>Mã sách</th>
+		<th>Tên sách</th>
+		<th>Tác giả</th>
+		<th>Xoá</th>
+		<th>Chi tiết</th>
+		</tr>";
+}
+$i = 0;
+while ($row = mysqli_fetch_array($result)) {
+	$i++;
+	if ($id) {
+
+		echo "<tr>";
+		echo "<td>" . $i . "</td>";
+		echo "<td>" . $row['masach'] . "</td>";
+		echo "<td>" . $row['tensach'] . "</td>";
+		echo "<td>" . $row['tacgia'] . "</td>";
+		echo "<td>" . $row['nhaxuatban'] . "</td>";
+		echo "<td>" . $row['gia'] . "</td>";
+		echo "<td>" . $row['theloai'] . "</td>";
+		echo "</tr>";
+	} else {
+
+		echo "<tr>";
+		echo "<td>" . $i . "</td>";
+		echo "<td>" . $row['masach'] . "</td>";
+		echo "<td>" . $row['tensach'] . "</td>";
+		echo "<td>" . $row['tacgia'] . "</td>";
+		echo "<td><input type='checkbox'></td>";
+		echo "<td><a href='./detail.php?id=" . $row['masach'] . "'>detail</a></td>";
+		echo "</tr>";
+	}
+}
+echo "</table>";
+mysqli_close($conn);
